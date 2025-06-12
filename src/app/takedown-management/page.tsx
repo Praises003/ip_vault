@@ -75,7 +75,7 @@ export default function TakedownManagementPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("created_desc")
   const [showDetails, setShowDetails] = useState<string | null>(null)
-  const [showBulkActions, setShowBulkActions] = useState(false)
+  const [/*showBulkActions*/, setShowBulkActions] = useState(false)
 
   // Mock takedown notices data
   const [takedownNotices] = useState<TakedownNotice[]>([

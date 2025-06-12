@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -81,10 +81,11 @@ type Status =
   | "false_positive";
 
 type AssetType = "image" | "text" | "video" | "audio" | "code";
-
+type SearchMethod = "text" | "image" | "url" | "select" | "upload";
 
 export default function TheftDetectionPage() {
-  const [searchMethod, setSearchMethod] = useState<"upload" | "select" | "url">("select")
+  const [searchMethod, setSearchMethod] = useState<SearchMethod>("text");
+
   const [selectedAsset, setSelectedAsset] = useState<string>("")
   const [searchUrl, setSearchUrl] = useState("")
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
@@ -142,7 +143,7 @@ export default function TheftDetectionPage() {
   ]
 
   // Mock search results
-  const mockResults: DetectedMatch[] = [
+ const mockResults = useMemo<DetectedMatch[]>(() => [
     {
       id: "1",
       url: "https://fake-design-site.com/stolen-logos",
@@ -234,7 +235,7 @@ export default function TheftDetectionPage() {
         lastModified: "2024-01-15",
       },
     },
-  ]
+  ], [])
 
   const simulateSearch = useCallback(async () => {
     setIsSearching(true)
@@ -468,7 +469,7 @@ Sincerely,
                 {/* Search Method */}
                 <div>
                   <Label className="text-base font-medium mb-3 block">Search Method</Label>
-                  <Tabs value={searchMethod} onValueChange={(value) => setSearchMethod(value as any)}>
+                  <Tabs value={searchMethod} onValueChange={(value) => setSearchMethod(value as SearchMethod)}>
                     <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="select" className="text-xs">
                         My Assets
