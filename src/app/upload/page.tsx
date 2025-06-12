@@ -55,6 +55,9 @@ interface LicenseTemplate {
   recommended?: boolean
 }
 
+type FileStatus = "uploading" | "processing" | "hashing" | "timestamping" | "complete";
+
+
 export default function UploadPage() {
   const [step, setStep] = useState(1)
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
@@ -127,7 +130,8 @@ export default function UploadPage() {
   ]
 
   const simulateFileProcessing = useCallback((fileId: string) => {
-    const stages = ["uploading", "processing", "hashing", "timestamping", "complete"]
+     const stages: FileStatus[] = ["uploading", "processing", "hashing", "timestamping", "complete"];
+
     let currentStage = 0
     let progress = 0
 
@@ -162,10 +166,12 @@ export default function UploadPage() {
         progress = 0
       }
 
-      setUploadedFiles((prev) =>
-        prev.map((file) => (file.id === fileId ? { ...file, status: stages[currentStage] as any, progress } : file)),
+          setUploadedFiles((prev) =>
+      prev.map((file) =>
+        file.id === fileId ? { ...file, status: stages[currentStage], progress } : file
       )
-    }, 300)
+    );
+  }, 300);
 
     return interval
   }, [])

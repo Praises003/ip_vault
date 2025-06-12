@@ -109,6 +109,11 @@ interface License {
   originalLicenseId?: string
 }
 
+type Status = "active" | "expired" | "revoked" | "pending";
+
+type LicenseType = "standard" | "extended" | "exclusive" | "custom";
+
+
 export default function LicenseManagementPage() {
   const [selectedLicenses, setSelectedLicenses] = useState<string[]>([])
   const [filterType, setFilterType] = useState("all")
@@ -118,7 +123,7 @@ export default function LicenseManagementPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLicense, setSelectedLicense] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("all")
-  const [showBulkActions, setShowBulkActions] = useState(false)
+  const [/*showBulkActions*/, setShowBulkActions] = useState(false)
 
   // Mock licenses data
   const [licenses] = useState<License[]>([
@@ -643,38 +648,48 @@ export default function LicenseManagementPage() {
   ]
 
   // Get status badge
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      active: { variant: "default" as const, color: "text-green-600", icon: CheckCircle },
-      expired: { variant: "secondary" as const, color: "text-red-600", icon: XCircle },
-      revoked: { variant: "destructive" as const, color: "text-red-600", icon: Ban },
-      pending: { variant: "outline" as const, color: "text-yellow-600", icon: Clock },
-    }
-    const config = variants[status] || variants.active
-    const Icon = config.icon
-    return (
-      <Badge variant={config.variant} className={config.color}>
-        <Icon className="h-3 w-3 mr-1" />
-        {status}
-      </Badge>
-    )
-  }
+  const getStatusBadge = (status: Status) => {
+  const variants: Record<
+    Status,
+    { variant: "default" | "secondary" | "destructive" | "outline"; color: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }
+  > = {
+    active: { variant: "default", color: "text-green-600", icon: CheckCircle },
+    expired: { variant: "secondary", color: "text-red-600", icon: XCircle },
+    revoked: { variant: "destructive", color: "text-red-600", icon: Ban },
+    pending: { variant: "outline", color: "text-yellow-600", icon: Clock },
+  };
+
+  const config = variants[status] || variants.active;
+  const Icon = config.icon;
+
+  return (
+    <Badge variant={config.variant} className={config.color}>
+      <Icon className="h-3 w-3 mr-1" />
+      {status}
+    </Badge>
+  );
+};
 
   // Get license type badge
-  const getLicenseTypeBadge = (type: string) => {
-    const variants = {
-      standard: { variant: "outline" as const, color: "text-blue-600" },
-      extended: { variant: "default" as const, color: "text-green-600" },
-      exclusive: { variant: "default" as const, color: "text-orange-600" },
-      custom: { variant: "secondary" as const, color: "text-purple-600" },
-    }
-    const config = variants[type] || variants.standard
-    return (
-      <Badge variant={config.variant} className={config.color}>
-        {type}
-      </Badge>
-    )
-  }
+  const getLicenseTypeBadge = (type: LicenseType) => {
+  const variants: Record<
+    LicenseType,
+    { variant: "default" | "secondary" | "outline"; color: string }
+  > = {
+    standard: { variant: "outline", color: "text-blue-600" },
+    extended: { variant: "default", color: "text-green-600" },
+    exclusive: { variant: "default", color: "text-orange-600" },
+    custom: { variant: "secondary", color: "text-purple-600" },
+  };
+
+  const config = variants[type] || variants.standard;
+
+  return (
+    <Badge variant={config.variant} className={config.color}>
+      {type}
+    </Badge>
+  );
+};
 
   // Handle bulk actions
   const handleBulkAction = (action: string) => {

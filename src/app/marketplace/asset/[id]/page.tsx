@@ -520,7 +520,7 @@ All logos are fully customizable and can be easily modified to match your brand 
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-medium text-green-600 mb-2">What's Included:</h4>
+                  <h4 className="font-medium text-green-600 mb-2">What&apos;s Included:</h4>
                   <div className="space-y-1">
                     {selectedLicenseData.features.map((feature, index) => (
                       <div key={index} className="flex items-center space-x-2 text-sm">

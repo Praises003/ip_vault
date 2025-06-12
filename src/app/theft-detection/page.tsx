@@ -260,7 +260,7 @@ export default function TheftDetectionPage() {
     // Set mock results
     setSearchResults(mockResults)
     setIsSearching(false)
-  }, [])
+  }, [mockResults])
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
