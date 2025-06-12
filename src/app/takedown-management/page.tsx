@@ -66,7 +66,18 @@ interface TakedownNotice {
   estimatedDamages?: number
   legalAction: boolean
 }
+type StatusType =
+  | "draft"
+  | "pending"
+  | "submitted"
+  | "acknowledged"
+  | "resolved"
+  | "rejected"
+  | "expired"
 
+
+  type Priority = "low" | "medium" | "high" | "urgent";
+  type NoticeType = "dmca" | "platform" | "cease_desist";
 export default function TakedownManagementPage() {
   const [selectedNotices, setSelectedNotices] = useState<string[]>([])
   const [filterStatus, setFilterStatus] = useState("all")
@@ -227,55 +238,63 @@ export default function TakedownManagementPage() {
     },
   ])
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      draft: { variant: "outline" as const, color: "text-gray-600", icon: Edit },
-      pending: { variant: "secondary" as const, color: "text-yellow-600", icon: Clock },
-      submitted: { variant: "default" as const, color: "text-blue-600", icon: Send },
-      acknowledged: { variant: "default" as const, color: "text-purple-600", icon: MessageSquare },
-      resolved: { variant: "default" as const, color: "text-green-600", icon: CheckCircle },
-      rejected: { variant: "destructive" as const, color: "text-red-600", icon: XCircle },
-      expired: { variant: "outline" as const, color: "text-orange-600", icon: AlertTriangle },
-    }
-    const config = variants[status] || variants.draft
-    const Icon = config.icon
-    return (
-      <Badge variant={config.variant} className={config.color}>
-        <Icon className="h-3 w-3 mr-1" />
-        {status.replace("_", " ")}
-      </Badge>
-    )
-  }
+  const statusVariants: Record<StatusType, {
+  variant: "default" | "destructive" | "outline" | "secondary";
+  color: string;
+  icon: React.ElementType;
+}> = {
+  draft: { variant: "outline", color: "text-gray-600", icon: Edit },
+  pending: { variant: "secondary", color: "text-yellow-600", icon: Clock },
+  submitted: { variant: "default", color: "text-blue-600", icon: Send },
+  acknowledged: { variant: "default", color: "text-purple-600", icon: MessageSquare },
+  resolved: { variant: "default", color: "text-green-600", icon: CheckCircle },
+  rejected: { variant: "destructive", color: "text-red-600", icon: XCircle },
+  expired: { variant: "outline", color: "text-orange-600", icon: AlertTriangle },
+}
 
-  const getPriorityBadge = (priority: string) => {
-    const variants = {
-      low: { variant: "outline" as const, color: "text-gray-600" },
-      medium: { variant: "secondary" as const, color: "text-blue-600" },
-      high: { variant: "default" as const, color: "text-orange-600" },
-      urgent: { variant: "destructive" as const, color: "text-red-600" },
-    }
-    const config = variants[priority] || variants.medium
-    return (
-      <Badge variant={config.variant} className={config.color}>
-        {priority}
-      </Badge>
-    )
-  }
 
-  const getNoticeTypeBadge = (type: string) => {
-    const variants = {
-      dmca: { variant: "default" as const, color: "text-blue-600" },
-      platform: { variant: "secondary" as const, color: "text-green-600" },
-      cease_desist: { variant: "destructive" as const, color: "text-red-600" },
-    }
-    const config = variants[type] || variants.dmca
-    return (
-      <Badge variant={config.variant} className={config.color}>
-        {type.replace("_", " & ").toUpperCase()}
-      </Badge>
-    )
-  }
+const getStatusBadge = (status: StatusType) => {
+  const config = statusVariants[status]
+  const Icon = config.icon
+  return (
+    <Badge variant={config.variant} className={config.color}>
+      <Icon className="h-3 w-3 mr-1" />
+      {status.replace("_", " ")}
+    </Badge>
+  )
+}
 
+const getPriorityBadge = (priority: Priority) => {
+  const variants: Record<Priority, { variant: "outline" | "secondary" | "default" | "destructive"; color: string }> = {
+    low: { variant: "outline", color: "text-gray-600" },
+    medium: { variant: "secondary", color: "text-blue-600" },
+    high: { variant: "default", color: "text-orange-600" },
+    urgent: { variant: "destructive", color: "text-red-600" },
+  };
+
+  const config = variants[priority] ?? variants.medium;
+
+  return (
+    <Badge variant={config.variant} className={config.color}>
+      {priority}
+    </Badge>
+  );
+};
+const getNoticeTypeBadge = (type: NoticeType) => {
+  const variants: Record<NoticeType, { variant: "default" | "secondary" | "destructive"; color: string }> = {
+    dmca: { variant: "default", color: "text-blue-600" },
+    platform: { variant: "secondary", color: "text-green-600" },
+    cease_desist: { variant: "destructive", color: "text-red-600" },
+  };
+
+  const config = variants[type as NoticeType] ?? variants.dmca;
+
+  return (
+    <Badge variant={config.variant} className={config.color}>
+      {type.replace("_", " & ").toUpperCase()}
+    </Badge>
+  );
+};
   const filteredNotices = takedownNotices.filter((notice) => {
     const statusMatch = filterStatus === "all" || notice.status === filterStatus
     const platformMatch = filterPlatform === "all" || notice.platform.toLowerCase().includes(filterPlatform)
