@@ -70,6 +70,19 @@ interface SearchAsset {
   uploadDate: string
 }
 
+type Confidence = "high" | "medium" | "low";
+type BadgeVariant = "default" | "destructive" | "outline" | "secondary";
+
+type Status =
+  | "new"
+  | "investigating"
+  | "takedown_sent"
+  | "resolved"
+  | "false_positive";
+
+type AssetType = "image" | "text" | "video" | "audio" | "code";
+
+
 export default function TheftDetectionPage() {
   const [searchMethod, setSearchMethod] = useState<"upload" | "select" | "url">("select")
   const [selectedAsset, setSelectedAsset] = useState<string>("")
@@ -256,48 +269,100 @@ export default function TheftDetectionPage() {
     }
   }
 
-  const getConfidenceBadge = (confidence: string) => {
-    const variants = {
-      high: "destructive",
-      medium: "secondary",
-      low: "outline",
-    }
-    return <Badge variant={variants[confidence] || "secondary"}>{confidence} confidence</Badge>
-  }
+  // const getConfidenceBadge = (confidence: "high" | "medium" | "low") => {
+  //   const variants = {
+  //     high: "destructive",
+  //     medium: "secondary",
+  //     low: "outline",
+  //   }
+  //   return <Badge variant={variants[confidence] || "secondary"}>{confidence} confidence</Badge>
+  // }
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      new: "destructive",
-      investigating: "secondary",
-      takedown_sent: "default",
-      resolved: "default",
-      false_positive: "outline",
-    }
-    const colors = {
-      new: "text-red-600",
-      investigating: "text-yellow-600",
-      takedown_sent: "text-blue-600",
-      resolved: "text-green-600",
-      false_positive: "text-gray-600",
-    }
-    return (
-      <Badge variant={variants[status] || "secondary"} className={colors[status]}>
-        {status.replace("_", " ")}
-      </Badge>
-    )
-  }
+const getConfidenceBadge = (confidence: Confidence) => {
+  const variants: Record<Confidence, BadgeVariant> = {
+    high: "destructive",
+    medium: "secondary",
+    low: "outline",
+  };
 
-  const getAssetIcon = (type: string) => {
-    const icons = {
-      image: ImageIcon,
-      text: FileText,
-      video: Video,
-      audio: Music,
-      code: Code,
-    }
-    const Icon = icons[type] || FileText
-    return <Icon className="h-4 w-4" />
-  }
+  return (
+    <Badge variant={variants[confidence]}>
+      {confidence} confidence
+    </Badge>
+  );
+};
+
+  // const getStatusBadge = (status: string) => {
+  //   const variants = {
+  //     new: "destructive",
+  //     investigating: "secondary",
+  //     takedown_sent: "default",
+  //     resolved: "default",
+  //     false_positive: "outline",
+  //   }
+  //   const colors = {
+  //     new: "text-red-600",
+  //     investigating: "text-yellow-600",
+  //     takedown_sent: "text-blue-600",
+  //     resolved: "text-green-600",
+  //     false_positive: "text-gray-600",
+  //   }
+  //   return (
+  //     <Badge variant={variants[status] || "secondary"} className={colors[status]}>
+  //       {status.replace("_", " ")}
+  //     </Badge>
+  //   )
+  // }
+
+const getStatusBadge = (status: Status) => {
+  const variants: Record<Status, BadgeVariant> = {
+    new: "destructive",
+    investigating: "secondary",
+    takedown_sent: "default",
+    resolved: "default",
+    false_positive: "outline",
+  };
+
+  const colors: Record<Status, string> = {
+    new: "text-red-600",
+    investigating: "text-yellow-600",
+    takedown_sent: "text-blue-600",
+    resolved: "text-green-600",
+    false_positive: "text-gray-600",
+  };
+
+  return (
+    <Badge variant={variants[status]} className={colors[status]}>
+      {status.replace("_", " ")}
+    </Badge>
+  );
+};
+
+
+  // const getAssetIcon = (type: string) => {
+  //   const icons = {
+  //     image: ImageIcon,
+  //     text: FileText,
+  //     video: Video,
+  //     audio: Music,
+  //     code: Code,
+  //   }
+  //   const Icon = icons[type] || FileText
+  //   return <Icon className="h-4 w-4" />
+  // }
+
+  const getAssetIcon = (type: AssetType) => {
+  const icons = {
+    image: ImageIcon,
+    text: FileText,
+    video: Video,
+    audio: Music,
+    code: Code,
+  };
+  const Icon = icons[type] || FileText;
+  return <Icon className="h-4 w-4" />;
+};
+
 
   const filteredResults = searchResults.filter((result) => {
     const platformMatch = filterPlatform === "all" || result.platform.toLowerCase().includes(filterPlatform)
@@ -725,7 +790,7 @@ Sincerely,
                   <Search className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">No Search Results</h3>
                   <p className="text-gray-600 mb-6">
-                    Configure your search settings and click "Start Theft Detection" to begin scanning for unauthorized
+                    Configure your search settings and click Start Theft Detection to begin scanning for unauthorized
                     use of your creative works.
                   </p>
                   <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">

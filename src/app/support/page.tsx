@@ -59,7 +59,7 @@ export default function SupportPage() {
       <div className="text-center mb-16">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Support</h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          We're here to help you protect and monetize your intellectual property. Choose your preferred way to get in
+          We&apos;re here to help you protect and monetize your intellectual property. Choose your preferred way to get in
           touch.
         </p>
       </div>
@@ -91,7 +91,7 @@ export default function SupportPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Send us a message</CardTitle>
-            <CardDescription>Fill out the form below and we'll get back to you as soon as possible.</CardDescription>
+            <CardDescription>Fill out the form below and we&apos;ll get back to you as soon as possible.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">

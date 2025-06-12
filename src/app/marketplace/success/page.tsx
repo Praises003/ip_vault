@@ -7,7 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Shield, CheckCircle, Download, FileText, Mail, ArrowRight } from "lucide-react"
 
 export default function PurchaseSuccessPage() {
-  const [purchaseDetails, setPurchaseDetails] = useState(null)
+  type PurchaseDetails = {
+  assetTitle: string;
+  license: string;
+  price: number;
+  transactionId: string;
+  downloadUrl: string;
+  licenseKey: string;
+  purchaseDate: string;
+};
+
+const [purchaseDetails, setPurchaseDetails] = useState<PurchaseDetails | null>(null);
 
   useEffect(() => {
     // In a real app, you'd get the session ID from URL params
@@ -130,7 +140,7 @@ export default function PurchaseSuccessPage() {
         {/* Next Steps */}
         <Card>
           <CardHeader>
-            <CardTitle>What's Next?</CardTitle>
+            <CardTitle>What&apos;s Next?</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start space-x-3">
@@ -138,7 +148,7 @@ export default function PurchaseSuccessPage() {
               <div>
                 <div className="font-medium">Check Your Email</div>
                 <div className="text-sm text-gray-600">
-                  We've sent a confirmation email with your receipt and download links.
+                  We&apos;ve sent a confirmation email with your receipt and download links.
                 </div>
               </div>
             </div>
