@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     // 2. Create a Stripe checkout session
     // 3. Return the session URL
 
-    console.log("Creating checkout session for:", { assetId, license, price })
+    console.log("Creating checkout session for:", { assetId, license, price, customerEmail })
 
     // Mock response
     return NextResponse.json({
