@@ -31,13 +31,13 @@ import {
 //   };
 // }
 
-export type paramsType = { id: string };
+// export type paramsType = { id: string };
 
-type PageProps = {
-  params: paramsType;
-};
+// type PageProps = {
+//   params: paramsType;
+// };
 
-export default function AssetDetailPage({ params }: PageProps) {
+export default function AssetDetailPage({ params }: { params: { id: string } }) {
   const [isLiked, setIsLiked] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("standard")
   
