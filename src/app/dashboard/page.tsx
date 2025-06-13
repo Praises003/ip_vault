@@ -51,7 +51,7 @@ export default function Dashboard() {
   | "resolved"
   | "successful";
 
-
+  type Severity = "high" | "medium" | "low";
 
 
   // Mock data for KPIs
@@ -266,15 +266,19 @@ export default function Dashboard() {
 };
 
 
-  const getSeverityBadge = (severity: Status) => {
-    const variants: Record<Status, "default" | "destructive" | "outline" | "secondary"> = {
-      high: "destructive",
-      medium: "secondary",
-      low: "outline",
-    }
-    return <Badge variant={variants[severity] || "secondary"}>{severity}</Badge>
-  }
+const getSeverityBadge = (severity: Severity) => {
+  const variants: Record<Severity, "default" | "destructive" | "outline" | "secondary"> = {
+    high: "destructive",
+    medium: "secondary",
+    low: "outline",
+  };
 
+  return (
+    <Badge variant={variants[severity]}>
+      {severity}
+    </Badge>
+  );
+};
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
