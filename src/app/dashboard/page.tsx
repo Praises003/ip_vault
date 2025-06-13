@@ -42,6 +42,18 @@ import { useState } from "react"
 export default function Dashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  type Status =
+  | "completed"
+  | "pending"
+  | "active"
+  | "investigating"
+  | "takedown_sent"
+  | "resolved"
+  | "successful";
+
+
+
+
   // Mock data for KPIs
   const kpis = {
     revenue: {
@@ -235,21 +247,27 @@ export default function Dashboard() {
     },
   ]
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      completed: "default",
-      pending: "secondary",
-      active: "default",
-      investigating: "destructive",
-      takedown_sent: "secondary",
-      resolved: "default",
-      successful: "default",
-    }
-    return <Badge variant={variants[status] || "secondary"}>{status.replace("_", " ")}</Badge>
-  }
+  const getStatusBadge = (status: Status) => {
+  const variants: Record<Status, string> = {
+    completed: "default",
+    pending: "secondary",
+    active: "default",
+    investigating: "destructive",
+    takedown_sent: "secondary",
+    resolved: "default",
+    successful: "default",
+  };
 
-  const getSeverityBadge = (severity: string) => {
-    const variants = {
+  return (
+    <Badge variant={variants[status]}>
+      {status.replace("_", " ")}
+    </Badge>
+  );
+};
+
+
+  const getSeverityBadge = (severity: Status) => {
+    const variants: Record<Status, string>{
       high: "destructive",
       medium: "secondary",
       low: "outline",
