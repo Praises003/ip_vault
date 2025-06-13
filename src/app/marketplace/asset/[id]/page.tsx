@@ -33,9 +33,9 @@ import {
 
 export type paramsType = { id: string };
 
-interface PageProps {
-  params: Promise<paramsType>; // <--- THIS IS THE KEY CHANGE
-}
+type PageProps = {
+  params: ParamsType;
+};
 
 export default function AssetDetailPage({ params }: PageProps) {
   const [isLiked, setIsLiked] = useState(false)
