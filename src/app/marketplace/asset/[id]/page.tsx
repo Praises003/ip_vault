@@ -40,7 +40,7 @@ import {
 export default function AssetDetailPage({ params }: { params: Promise<{ id: string; }> }) {
   const [isLiked, setIsLiked] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("standard")
-  const [id, setId] = useState<string | null>(null);
+  const [id, setId] = useState<string>(null);
   
 
   useEffect(() => {
