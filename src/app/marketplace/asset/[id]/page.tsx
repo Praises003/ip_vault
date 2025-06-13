@@ -33,8 +33,11 @@ import {
 
 export type paramsType = { id: string };
 
+interface PageProps {
+  params: Promise<paramsType>; // <--- THIS IS THE KEY CHANGE
+}
 
-export default function AssetDetailPage({ params }: { params: paramsType }) {
+export default function AssetDetailPage({ params }: PageProps) {
   const [isLiked, setIsLiked] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("standard")
   
