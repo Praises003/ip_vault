@@ -33,9 +33,10 @@ import {
 
 export type paramsType = Promise<{ id: string }>;
 
-export default function AssetDetailPage({ params}: paramsType  {
+export default function AssetDetailPage(props: { params: paramsType }) {
   const [isLiked, setIsLiked] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("standard")
+  const params = props.params
 
   // Mock asset data - in real app, fetch based on params.id
   const asset = {
