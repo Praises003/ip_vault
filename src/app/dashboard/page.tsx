@@ -267,7 +267,7 @@ export default function Dashboard() {
 
 
   const getSeverityBadge = (severity: Status) => {
-    const variants: Record<Status, string>{
+    const variants: Record<Status, string> = {
       high: "destructive",
       medium: "secondary",
       low: "outline",
