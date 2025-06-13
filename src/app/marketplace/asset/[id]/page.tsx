@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useParams } from "next/navigation"
 
 import {
   Shield,
@@ -37,16 +38,17 @@ import {
 //   params: paramsType;
 // };
 
-export default function AssetDetailPage({ params }: { params: { id: string } }) {
+export default function AssetDetailPage() {
+  const params = useParams()
   const [isLiked, setIsLiked] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("standard")
-  
+  const paramId = params.id as string
 
 
         
   // Mock asset data - in real app, fetch based on params.id
   const asset = {
-    id: Number.parseInt(params.id),
+    id: Number.parseInt(paramId),
     title: "Modern Logo Design Kit",
     description:
       "Professional logo templates for startups and businesses. This comprehensive kit includes 50+ unique logo designs, vector files, and brand guidelines to help you create a strong brand identity.",
