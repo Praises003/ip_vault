@@ -666,7 +666,7 @@ const getSeverityBadge = (severity: Severity) => {
                               </Button>
                             </div>
                           </TableCell>
-                          <TableCell>{getSeverityBadge(infringement.severity)}</TableCell>
+                          <TableCell>{getSeverityBadge(infringement.severity as Severity)}</TableCell>
                           <TableCell>{getStatusBadge(infringement.status as Status)}</TableCell>
                           <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                             {infringement.detected}
