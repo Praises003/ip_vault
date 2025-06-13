@@ -37,24 +37,16 @@ import {
 //   params: paramsType;
 // };
 
-export default function AssetDetailPage({ params }: { params: Promise<{ id: string; }> }) {
+export default function AssetDetailPage({ params }: { params: { id: string } }) {
   const [isLiked, setIsLiked] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("standard")
-  const [id, setId] = useState<string>("");
   
 
-  useEffect(() => {
-            const getParams = async () => {
-                const { id } = await params;
-                setId(id);
-            };
-            getParams();
-        }, [params]); //  Dependency array
 
         
   // Mock asset data - in real app, fetch based on params.id
   const asset = {
-    id: Number.parseInt(id),
+    id: Number.parseInt(params.id),
     title: "Modern Logo Design Kit",
     description:
       "Professional logo templates for startups and businesses. This comprehensive kit includes 50+ unique logo designs, vector files, and brand guidelines to help you create a strong brand identity.",

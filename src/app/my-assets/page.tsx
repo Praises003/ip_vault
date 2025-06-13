@@ -81,6 +81,8 @@ interface Asset {
   collaborators?: string[]
   versions?: number
 }
+type AssetType = "image" | "text" | "document" | "video" | "audio" | "code"
+type Status = "active" | "pending" | "draft" | "archived"
 
 interface License {
   id: string
@@ -601,36 +603,43 @@ export default function MyAssetsPage() {
   })
 
   // Get asset type icon
-  const getAssetTypeIcon = (type: string) => {
-    const icons = {
-      image: ImageIcon,
-      text: FileText,
-      document: FileText,
-      video: Video,
-      audio: Music,
-      code: Code,
-    }
-    const Icon = icons[type] || FileText
-    return <Icon className="h-4 w-4" />
+  const getAssetTypeIcon = (type: AssetType) => {
+  const icons: Record<AssetType, React.ElementType> = {
+    image: ImageIcon,
+    text: FileText,
+    document: FileText,
+    video: Video,
+    audio: Music,
+    code: Code,
   }
 
+  const Icon = icons[type] || FileText
+  return <Icon className="h-4 w-4" />
+}
+
   // Get status badge
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      active: { variant: "default" as const, color: "text-green-600", icon: CheckCircle },
-      pending: { variant: "secondary" as const, color: "text-yellow-600", icon: Clock },
-      draft: { variant: "outline" as const, color: "text-gray-600", icon: Edit },
-      archived: { variant: "outline" as const, color: "text-red-600", icon: Archive },
-    }
-    const config = variants[status] || variants.active
-    const Icon = config.icon
-    return (
-      <Badge variant={config.variant} className={config.color}>
-        <Icon className="h-3 w-3 mr-1" />
-        {status}
-      </Badge>
-    )
+const getStatusBadge = (status: string) => {
+  const variants: Record<Status, {
+    variant: "default" | "secondary" | "outline"
+    color: string
+    icon: React.ElementType
+  }> = {
+    active: { variant: "default", color: "text-green-600", icon: CheckCircle },
+    pending: { variant: "secondary", color: "text-yellow-600", icon: Clock },
+    draft: { variant: "outline", color: "text-gray-600", icon: Edit },
+    archived: { variant: "outline", color: "text-red-600", icon: Archive },
   }
+
+  const config = variants[status as Status] || variants.active
+  const Icon = config.icon
+
+  return (
+    <Badge variant={config.variant} className={config.color}>
+      <Icon className="h-3 w-3 mr-1" />
+      {status}
+    </Badge>
+  )
+}
 
   // Calculate total stats
   const totalStats = {
