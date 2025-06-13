@@ -51,14 +51,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
             getParams();
         }, [params]); //  Dependency array
 
-        if (!id) {
-            return <div>Loading...</div>;
-        }
-
-        return (
-            <div>{id}</div>
-        );
-    }
+        
   // Mock asset data - in real app, fetch based on params.id
   const asset = {
     id: Number.parseInt(id),
