@@ -566,7 +566,7 @@ const getSeverityBadge = (severity: Severity) => {
                             ${sale.amount}
                           </TableCell>
                           <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{sale.date}</TableCell>
-                          <TableCell>{getStatusBadge(sale.status)}</TableCell>
+                          <TableCell>{getStatusBadge(sale.status as Status)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
