@@ -37,7 +37,7 @@ import {
 //   params: paramsType;
 // };
 
-export default function AssetDetailPage({ params }: { params: { id: string } }) {
+export default function AssetDetailPage({ params }: { params: Promise<{ id: string; }> }) {
   const [isLiked, setIsLiked] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("standard")
   
