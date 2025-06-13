@@ -34,7 +34,7 @@ import {
 export type paramsType = { id: string };
 
 type PageProps = {
-  params: ParamsType;
+  params: paramsType;
 };
 
 export default function AssetDetailPage({ params }: PageProps) {
