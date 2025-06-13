@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -40,11 +40,28 @@ import {
 export default function AssetDetailPage({ params }: { params: Promise<{ id: string; }> }) {
   const [isLiked, setIsLiked] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("standard")
+  const [id, setId] = useState(null);
   
 
+  useEffect(() => {
+            const getParams = async () => {
+                const { id } = await params;
+                setId(id);
+            };
+            getParams();
+        }, [params]); //  Dependency array
+
+        if (!id) {
+            return <div>Loading...</div>;
+        }
+
+        return (
+            <div>{id}</div>
+        );
+    }
   // Mock asset data - in real app, fetch based on params.id
   const asset = {
-    id: Number.parseInt(params.id),
+    id: Number.parseInt(id),
     title: "Modern Logo Design Kit",
     description:
       "Professional logo templates for startups and businesses. This comprehensive kit includes 50+ unique logo designs, vector files, and brand guidelines to help you create a strong brand identity.",
