@@ -25,13 +25,15 @@ import {
   CreditCard,
 } from "lucide-react"
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-}
+// interface PageProps {
+//   params: {
+//     id: string;
+//   };
+// }
 
-export default function AssetDetailPage({ params }: PageProps) {
+export type paramsType = Promise<{ id: string }>;
+
+export default function AssetDetailPage({ params}: paramsType  {
   const [isLiked, setIsLiked] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("standard")
 
