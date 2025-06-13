@@ -34,7 +34,7 @@ import {
 export type paramsType = { id: string };
 
 
-export default function AssetDetailPage({ params }: { params: ParamsType }) {
+export default function AssetDetailPage({ params }: { params: paramsType }) {
   const [isLiked, setIsLiked] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("standard")
   
