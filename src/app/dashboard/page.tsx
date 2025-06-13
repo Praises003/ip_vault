@@ -613,7 +613,7 @@ const getSeverityBadge = (severity: Severity) => {
                             <TableCell className="capitalize text-xs sm:text-sm hidden sm:table-cell">
                               {upload.type}
                             </TableCell>
-                            <TableCell>{getStatusBadge(upload.status)}</TableCell>
+                            <TableCell>{getStatusBadge(upload.status as Status)}</TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-1">
                                 <Eye className="h-2 w-2 sm:h-3 sm:w-3 text-gray-400" />
@@ -667,7 +667,7 @@ const getSeverityBadge = (severity: Severity) => {
                             </div>
                           </TableCell>
                           <TableCell>{getSeverityBadge(infringement.severity)}</TableCell>
-                          <TableCell>{getStatusBadge(infringement.status)}</TableCell>
+                          <TableCell>{getStatusBadge(infringement.status as Status)}</TableCell>
                           <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                             {infringement.detected}
                           </TableCell>
@@ -707,7 +707,7 @@ const getSeverityBadge = (severity: Severity) => {
                           </TableCell>
                           <TableCell className="text-xs sm:text-sm hidden sm:table-cell">{log.platform}</TableCell>
                           <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{log.method}</TableCell>
-                          <TableCell>{getStatusBadge(log.status)}</TableCell>
+                          <TableCell>{getStatusBadge(log.status as Status)}</TableCell>
                           <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                             {log.responseDate ? (
                               log.responseDate
