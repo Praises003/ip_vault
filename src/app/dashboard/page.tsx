@@ -248,7 +248,7 @@ export default function Dashboard() {
   ]
 
   const getStatusBadge = (status: Status) => {
-  const variants: Record<Status, string> = {
+  const variants: Record<Status, "default" | "destructive" | "outline" | "secondary"> = {
     completed: "default",
     pending: "secondary",
     active: "default",
@@ -267,7 +267,7 @@ export default function Dashboard() {
 
 
   const getSeverityBadge = (severity: Status) => {
-    const variants: Record<Status, string> = {
+    const variants: Record<Status, "default" | "destructive" | "outline" | "secondary"> = {
       high: "destructive",
       medium: "secondary",
       low: "outline",
