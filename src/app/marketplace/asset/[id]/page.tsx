@@ -26,17 +26,8 @@ import {
   CreditCard,
 } from "lucide-react"
 
-// interface PageProps {
-//   params: {
-//     id: string;
-//   };
-// }
 
-// export type paramsType = { id: string };
 
-// type PageProps = {
-//   params: paramsType;
-// };
 
 export default function AssetDetailPage() {
   const params = useParams()
