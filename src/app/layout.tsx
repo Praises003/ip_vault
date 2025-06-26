@@ -2,9 +2,12 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import "react-toastify/dist/ReactToastify.css"
+import {ToastContainer} from "react-toastify"
 import { Navbar } from "@/components/navbar"
+import { Providers } from "@/lib/features/provider"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], display: 'swap', adjustFontFallback: false })
 
 export const metadata: Metadata = {
   title: "IP Vault - Secure Your Creative Works",
@@ -19,8 +22,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navbar />
-        <main className="min-h-screen bg-gray-50">{children}</main>
+        <Providers>
+          <Navbar />
+          <main className="min-h-screen bg-gray-50">{children}</main>
+          
+          <ToastContainer />
+        </Providers>
+        
       </body>
     </html>
   )

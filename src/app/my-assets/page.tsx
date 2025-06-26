@@ -50,6 +50,7 @@ import {
 } from "lucide-react"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
 interface Asset {
   id: string
@@ -677,6 +678,7 @@ const getStatusBadge = (status: string) => {
   }
 
   return (
+    <ProtectedRoute>
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-50">
@@ -1487,5 +1489,6 @@ const getStatusBadge = (status: string) => {
         </Dialog>
       </div>
     </div>
+    </ProtectedRoute>
   )
 }

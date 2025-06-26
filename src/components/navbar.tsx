@@ -12,8 +12,41 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useDispatch, useSelector } from "react-redux"
 
-const navigationLinks = [
+import {  RootState } from "@/lib/store"
+
+
+// const navigationLinks = [
+//   { name: "Dashboard", href: "/dashboard" },
+//   { name: "Upload Assets", href: "/upload" },
+//   { name: "Marketplace", href: "/marketplace" },
+//   { name: "Theft Detection", href: "/theft-detection" },
+//   { name: "Takedown Management", href: "/takedown-management" },
+//   { name: "My Assets", href: "/my-assets" },
+//   { name: "License Management", href: "/license-management" },
+//   { name: "Pricing", href: "/pricing" },
+//   { name: "FAQ", href: "/faq" },
+//   { name: "Contact Support", href: "/support" },
+// ]
+
+export function Navbar() {
+  const { user, checkedUser} = useSelector((state: RootState) => state.auth)
+
+const authenticatedUser = user ?? checkedUser
+const isAuthenticated = !!authenticatedUser
+const publicLinks = [
+  { name: "Home", href: "/" },
+  { name: "Pricing", href: "/pricing" },
+  { name: "FAQ", href: "/faq" },
+  { name: "Contact", href: "/support" },
+  { name: "About", href: "/about" }, 
+  { name: "Login", href: "/login" },
+  { name: "Sign Up", href: "/signup" },
+  
+]
+
+const privateLinks = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Upload Assets", href: "/upload" },
   { name: "Marketplace", href: "/marketplace" },
@@ -21,12 +54,9 @@ const navigationLinks = [
   { name: "Takedown Management", href: "/takedown-management" },
   { name: "My Assets", href: "/my-assets" },
   { name: "License Management", href: "/license-management" },
-  { name: "Pricing", href: "/pricing" },
-  { name: "FAQ", href: "/faq" },
-  { name: "Contact Support", href: "/support" },
+  
 ]
 
-export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const toggleMobileMenu = () => {
@@ -50,7 +80,7 @@ export function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden lg:block">
             <div className="ml-10 flex items-baseline space-x-1">
-              {navigationLinks.map((link) => (
+              {publicLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
@@ -59,11 +89,21 @@ export function Navbar() {
                   {link.name}
                 </Link>
               ))}
+              {isAuthenticated && privateLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                >
+                  {link.name}
+                </Link>
+              ))}
+  
             </div>
           </div>
 
           {/* User Profile Dropdown */}
-          <div className="hidden lg:block">
+          {/* <div className="hidden lg:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -100,7 +140,7 @@ export function Navbar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+          </div> */}
 
           {/* Mobile menu button */}
           <div className="lg:hidden">
@@ -125,15 +165,25 @@ export function Navbar() {
       {isMobileMenuOpen && (
         <div className="lg:hidden">
           <div className="space-y-1 border-t border-gray-200 bg-white px-2 pb-3 pt-2 shadow-lg">
-            {navigationLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
+            {publicLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            
+            {isAuthenticated &&
+              privateLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                >
+                  {link.name}
+                </Link>
             ))}
 
             {/* Mobile User Menu */}
