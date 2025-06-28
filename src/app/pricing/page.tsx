@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 const pricingPlans = [
   {
     name: "Starter",
-    price: "$9",
+    price: "₦2000",
     period: "/month",
     description: "Perfect for individual creators and small projects",
     features: ["Up to 50 assets", "Basic IP protection", "Standard licensing", "Email support", "1GB storage"],
@@ -13,7 +13,7 @@ const pricingPlans = [
   },
   {
     name: "Professional",
-    price: "$29",
+    price: "₦4500",
     period: "/month",
     description: "Ideal for growing businesses and content creators",
     features: [
@@ -29,7 +29,7 @@ const pricingPlans = [
   },
   {
     name: "Enterprise",
-    price: "$99",
+    price: "₦8000",
     period: "/month",
     description: "For large organizations with extensive IP portfolios",
     features: [
