@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, } from "@reduxjs/toolkit"
 import api from "@/lib/axios"
-import {setAccessToken} from "@/lib/authUtils"
+import {setAccessToken, getAccessToken, removeAccessToken} from "@/lib/authUtils"
 import axios from "axios"
 
 
