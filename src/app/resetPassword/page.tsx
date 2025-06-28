@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { toast, ToastContainer } from "react-toastify"
-import axios from "@/lib/axios"
+
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { resetPassword } from "@/lib/features/authSlice"
@@ -15,8 +15,6 @@ export default function ResetPasswordPage() {
   const [email, setEmail] = useState("")
 
   const dispatch = useDispatch<AppDispatch>()
-const { loading, error, message } = useSelector((state: RootState) => state.auth)
-
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("resetEmail")

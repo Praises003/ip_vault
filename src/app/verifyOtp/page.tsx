@@ -4,11 +4,10 @@ import React, { useState, useRef, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "@/lib/store"
 import { verifyOtp } from "@/lib/features/authSlice"
-import { toast, ToastContainer } from "react-toastify"
-import { useRouter } from "next/navigation"
+import { toast } from "react-toastify"
+
 import axios from "axios"
 import { gsap } from "gsap"
-import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -66,7 +65,7 @@ export default function VerifyOtpPage() {
   try {
     await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/resend-otp`, { email })
     toast.success("OTP has been resent to your email.")
-  } catch (error: any) {
+  } catch (error: Error | any) {
     const msg = error.response?.data?.message || "Failed to resend OTP"
     toast.error(msg)
   }

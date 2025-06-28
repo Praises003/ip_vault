@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "@/lib/store"
 import { registerUser } from "@/lib/features/authSlice"
-import { toast, ToastContainer } from "react-toastify"
+import { toast } from "react-toastify"
 import { gsap } from "gsap"
 
 import { Button } from "@/components/ui/button"

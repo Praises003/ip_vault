@@ -1,136 +1,66 @@
+// 
+
 // /lib/axios.ts or /utils/axios.ts
 
-import axios from "axios"
-import { store } from "@/lib/store"               // optional: only if you're using Redux
-import { logout } from "@/lib/features/authSlice" // optional: handle session expiry
-import { toast } from "react-toastify"           // optional: show error toast
-
-// const api = axios.create({
-//   baseURL: process.env.NEXT_PUBLIC_API_URL,
-//   withCredentials: true, // send refresh token cookie
-// })
-
-// let isRefreshing = false
-// let failedQueue: any[] = []
-
-// const processQueue = (error: any, token: string | null = null) => {
-//   failedQueue.forEach((prom) => {
-//     if (error) {
-//       prom.reject(error)
-//     } else {
-//       prom.resolve(token)
-//     }
-//   })
-
-//   failedQueue = []
-// }
-
-// api.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     const originalRequest = error.config
-
-//     if (
-//       error.response?.status === 401 &&
-//       !originalRequest._retry &&
-//       !originalRequest.url.includes("/auth/refresh-token")
-//     ) {
-//       originalRequest._retry = true
-
-//       if (isRefreshing) {
-//         return new Promise(function (resolve, reject) {
-//           failedQueue.push({ resolve, reject })
-//         })
-//           .then((token) => {
-//             originalRequest.headers["Authorization"] = `Bearer ${token}`
-//             return api(originalRequest)
-//           })
-//           .catch((err) => {
-//             return Promise.reject(err)
-//           })
-//       }
-
-//       isRefreshing = true
-
-//       try {
-//         const res = await api.post("/api/auth/refresh-token")
-//         const newAccessToken = res.data.accessToken
-
-//         // Optional: update token storage
-//         localStorage.setItem("accessToken", newAccessToken)
-
-//         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`
-//         processQueue(null, newAccessToken)
-//         isRefreshing = false
-
-//         return api(originalRequest)
-//       } catch (err) {
-//         processQueue(err, null)
-//         isRefreshing = false
-
-//         // Optional: logout and redirect
-//         store.dispatch(logout())
-//         toast.error("Session expired. Please login again.")
-//         window.location.href = "/login"
-
-//         return Promise.reject(err)
-//       }
-//     }
-
-//     return Promise.reject(error)
-//   }
-// )
-
-// export default api
-
-
-
-import { getAccessToken, setAccessToken } from "@/lib/authUtils"
+import axios from "axios";
+import { store } from "@/lib/store"; // Optional: If you're using Redux
+import { logout } from "@/lib/features/authSlice"; // Optional: Redux logout action
+import { toast } from "react-toastify"; // Optional: Toast messages for error handling
+import { getAccessToken, setAccessToken } from "@/lib/authUtils"; // In-memory token management
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true, // send refresh token cookie
-})
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL}`, // Replace with your API URL
+  withCredentials: true, // Send cookies with requests, if needed (e.g., refresh token)
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-// ➤ Add token to request
+// Add an interceptor to include the token in every request
 api.interceptors.request.use(
   (config) => {
-    const token = getAccessToken()
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
+    const token = getAccessToken();
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
-    return config
+    return config;
   },
-  (error) => Promise.reject(error)
-)
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-// ➤ Auto-refresh on 401
+
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
   async (error) => {
-    const originalRequest = error.config
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const refreshToken = getAccessToken(); // Assuming you have a refresh token
       try {
-        const res = await api.post("/auth/refresh-token")
-        const newAccessToken = res.data.accessToken
-        setAccessToken(newAccessToken)
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
-        return api(originalRequest)
-      } catch (refreshError) {
-        console.error("Refresh token failed", refreshError)
-        // Optionally redirect to login
-        store.dispatch(logout())
-        toast.error("Session expired. Please login again.")
-        window.location.href = "/login"
-        return Promise.reject(refreshError)
+        const response = await api.post("/api/auth/refresh", { refreshToken });
+        const newToken = response.data.tokens.accessToken;
+
+        // Store the new token
+        setAccessToken(newToken);
+
+        // Retry the original request with the new token
+        originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+        return api(originalRequest);
+      } catch (err) {
+        // Handle error (e.g., redirect to login)
+        console.log("Token refresh failed");
+        return Promise.reject(error);
       }
     }
-
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
-export default api
+
+
+
+export default api;

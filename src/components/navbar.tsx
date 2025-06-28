@@ -103,7 +103,7 @@ const privateLinks = [
           </div>
 
           {/* User Profile Dropdown */}
-          {/* <div className="hidden lg:block">
+          <div className="hidden lg:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -140,7 +140,7 @@ const privateLinks = [
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div> */}
+          </div>
 
           {/* Mobile menu button */}
           <div className="lg:hidden">

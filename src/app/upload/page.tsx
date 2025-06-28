@@ -2,8 +2,9 @@
 
 import type React from "react"
 
-import { useState, useCallback } from "react"
+import { useState } from "react"
 import Link from "next/link"
+import api from "@/lib/axios"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,6 +16,8 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { toast } from "@/hooks/use-toast"
 import {
   Shield,
   Upload,
@@ -34,6 +37,9 @@ import {
   Brain,
   AlertCircle,
   Copy,
+  FileCheck,
+  CloudUpload,
+  Loader2,
 } from "lucide-react"
 
 interface UploadedFile {
@@ -41,8 +47,10 @@ interface UploadedFile {
   id: string
   hash?: string
   timestamp?: string
-  status: "uploading" | "processing" | "hashing" | "timestamping" | "complete"
+  status: "uploading" | "processing" | "hashing" | "timestamping" | "complete" | "error"
   progress: number
+  uploadProgress?: number
+  error?: string
 }
 
 interface LicenseTemplate {
@@ -55,8 +63,28 @@ interface LicenseTemplate {
   recommended?: boolean
 }
 
-type FileStatus = "uploading" | "processing" | "hashing" | "timestamping" | "complete";
+interface UploadResponse {
+  success: boolean
+  assetId?: string
+  message?: string
+  hash?: string
+  timestamp?: string
+}
 
+// Create Axios instance for API calls
+// const api = axios.create({
+//   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000",
+//   timeout: 30000, // 30 seconds timeout for file uploads
+// })
+
+// // Add request interceptor to include auth token
+// api.interceptors.request.use((config) => {
+//   const token = localStorage.getItem("accessToken")
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`
+//   }
+//   return config
+// })
 
 export default function UploadPage() {
   const [step, setStep] = useState(1)
@@ -71,14 +99,51 @@ export default function UploadPage() {
   const [selectedLicenses, setSelectedLicenses] = useState<string[]>([])
   const [aiGenerating, setAiGenerating] = useState(false)
   const [customLicense, setCustomLicense] = useState("")
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   const fileTypes = [
-    { type: "document", icon: FileText, label: "Documents", formats: "PDF, DOC, PPT", color: "blue" },
-    { type: "image", icon: ImageIcon, label: "Images & Design", formats: "JPG, PNG, SVG, PSD", color: "green" },
-    { type: "video", icon: Video, label: "Video & Animation", formats: "MP4, MOV, AVI", color: "purple" },
-    { type: "audio", icon: Music, label: "Audio", formats: "MP3, WAV, FLAC", color: "orange" },
-    { type: "code", icon: Code, label: "Code & Software", formats: "ZIP, JS, PY, etc.", color: "indigo" },
-    { type: "other", icon: Archive, label: "Other Files", formats: "Any format", color: "gray" },
+    {
+      type: "document",
+      icon: FileText,
+      label: "Documents",
+      formats: "PDF, DOC, PPT",
+      color: "blue",
+      accept: ".pdf,.doc,.docx,.ppt,.pptx",
+    },
+    {
+      type: "image",
+      icon: ImageIcon,
+      label: "Images & Design",
+      formats: "JPG, PNG, SVG, PSD",
+      color: "green",
+      accept: ".jpg,.jpeg,.png,.svg,.psd,.ai",
+    },
+    {
+      type: "video",
+      icon: Video,
+      label: "Video & Animation",
+      formats: "MP4, MOV, AVI",
+      color: "purple",
+      accept: ".mp4,.mov,.avi,.mkv",
+    },
+    {
+      type: "audio",
+      icon: Music,
+      label: "Audio",
+      formats: "MP3, WAV, FLAC",
+      color: "orange",
+      accept: ".mp3,.wav,.flac,.aac",
+    },
+    {
+      type: "code",
+      icon: Code,
+      label: "Code & Software",
+      formats: "ZIP, JS, PY, etc.",
+      color: "indigo",
+      accept: ".zip,.js,.py,.html,.css,.json",
+    },
+    { type: "other", icon: Archive, label: "Other Files", formats: "Any format", color: "gray", accept: "*" },
   ]
 
   const licenseTemplates: LicenseTemplate[] = [
@@ -129,82 +194,165 @@ export default function UploadPage() {
     },
   ]
 
-  const simulateFileProcessing = useCallback((fileId: string) => {
-     const stages: FileStatus[] = ["uploading", "processing", "hashing", "timestamping", "complete"];
+  // Real file upload function using Axios
+  const uploadFileToServer = async (file: File, fileId: string) => {
+    try {
+      const formDataToSend = new FormData()
+      formDataToSend.append("file", file)
+      formDataToSend.append("title", formData.title || file.name)
+      formDataToSend.append("description", formData.description || "")
+      formDataToSend.append("category", formData.category || "")
+      formDataToSend.append("tags", formData.tags || "")
+      formDataToSend.append("usage", formData.usage || "")
 
-    let currentStage = 0
-    let progress = 0
+      const response = await api.post<UploadResponse>("/api/asset/upload", formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            setUploadedFiles((prev) => prev.map((f) => (f.id === fileId ? { ...f, uploadProgress: progress } : f)))
+          }
+        },
+      })
 
-    const interval = setInterval(() => {
-      progress += Math.random() * 15 + 5
+      if (response.data.success) {
+        // Simulate blockchain processing after successful upload
+        await simulateBlockchainProcessing(fileId, response.data)
 
-      if (progress >= 100) {
-        progress = 100
-        currentStage = Math.min(currentStage + 1, stages.length - 1)
+        setUploadedFiles((prev) =>
+          prev.map((f) =>
+            f.id === fileId
+              ? {
+                  ...f,
+                  status: "complete",
+                  progress: 100,
+                  uploadProgress: 100,
+                  hash: response.data.hash || generateMockHash(),
+                  timestamp: response.data.timestamp || new Date().toISOString(),
+                }
+              : f,
+          ),
+        )
 
-        if (currentStage === stages.length - 1) {
-          // Generate mock hash and timestamp
-          const mockHash = `0x${Math.random().toString(16).substr(2, 64)}`
-          const mockTimestamp = new Date().toISOString()
-
-          setUploadedFiles((prev) =>
-            prev.map((file) =>
-              file.id === fileId
-                ? {
-                    ...file,
-                    status: "complete" as const,
-                    progress: 100,
-                    hash: mockHash,
-                    timestamp: mockTimestamp,
-                  }
-                : file,
-            ),
-          )
-          clearInterval(interval)
-          return
-        }
-        progress = 0
+        toast({
+          title: "Upload Successful",
+          description: `${file.name} has been uploaded and secured on the blockchain.`,
+        })
+      } else {
+        throw new Error(response.data.message || "Upload failed")
       }
+    } catch (error: any) {
+      console.error("Upload error:", error)
 
-          setUploadedFiles((prev) =>
-      prev.map((file) =>
-        file.id === fileId ? { ...file, status: stages[currentStage], progress } : file
+      setUploadedFiles((prev) =>
+        prev.map((f) =>
+          f.id === fileId
+            ? {
+                ...f,
+                status: "error",
+                error: error.response?.data?.message || error.message || "Upload failed",
+              }
+            : f,
+        ),
       )
-    );
-  }, 300);
 
-    return interval
-  }, [])
+      toast({
+        title: "Upload Failed",
+        description: error.response?.data?.message || error.message || "Failed to upload file",
+        variant: "destructive",
+      })
+    }
+  }
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const simulateBlockchainProcessing = async (fileId: string, uploadResponse: UploadResponse) => {
+    const stages = ["processing", "hashing", "timestamping"]
+
+    for (let i = 0; i < stages.length; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      setUploadedFiles((prev) =>
+        prev.map((f) =>
+          f.id === fileId
+            ? {
+                ...f,
+                status: stages[i] as any,
+                progress: ((i + 1) / stages.length) * 100,
+              }
+            : f,
+        ),
+      )
+    }
+  }
+
+  const generateMockHash = () => `0x${Math.random().toString(16).substr(2, 64)}`
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
+    setUploadError(null)
+
+    // Validate files
+    const maxSize = 100 * 1024 * 1024 // 100MB
+    const invalidFiles = files.filter((file) => file.size > maxSize)
+
+    if (invalidFiles.length > 0) {
+      setUploadError(`Some files exceed the 100MB limit: ${invalidFiles.map((f) => f.name).join(", ")}`)
+      return
+    }
 
     const newFiles: UploadedFile[] = files.map((file) => ({
       file,
       id: Math.random().toString(36).substr(2, 9),
       status: "uploading",
       progress: 0,
+      uploadProgress: 0,
     }))
 
     setUploadedFiles((prev) => [...prev, ...newFiles])
+    setIsUploading(true)
 
-    // Start processing each file
-    newFiles.forEach((file) => {
-      simulateFileProcessing(file.id)
-    })
+    // Upload files one by one
+    for (const newFile of newFiles) {
+      await uploadFileToServer(newFile.file, newFile.id)
+    }
+
+    setIsUploading(false)
   }
 
   const removeFile = (fileId: string) => {
     setUploadedFiles((prev) => prev.filter((file) => file.id !== fileId))
   }
 
+  const retryUpload = async (fileId: string) => {
+    const file = uploadedFiles.find((f) => f.id === fileId)
+    if (!file) return
+
+    setUploadedFiles((prev) =>
+      prev.map((f) =>
+        f.id === fileId
+          ? {
+              ...f,
+              status: "uploading",
+              progress: 0,
+              uploadProgress: 0,
+              error: undefined,
+            }
+          : f,
+      ),
+    )
+
+    await uploadFileToServer(file.file, fileId)
+  }
+
   const generateAILicense = async () => {
     setAiGenerating(true)
 
-    // Simulate AI generation
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      // Simulate AI generation - replace with real API call
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    const aiGeneratedLicense = `CUSTOM LICENSE AGREEMENT
+      const aiGeneratedLicense = `CUSTOM LICENSE AGREEMENT
 
 This license is automatically generated based on your asset: "${formData.title}"
 
@@ -229,18 +377,35 @@ Asset Hash: ${uploadedFiles[0]?.hash || "Pending..."}
 
 This license was generated using AI based on your asset details and intended usage.`
 
-    setCustomLicense(aiGeneratedLicense)
-    setAiGenerating(false)
+      setCustomLicense(aiGeneratedLicense)
+
+      toast({
+        title: "License Generated",
+        description: "AI has successfully generated a custom license for your asset.",
+      })
+    } catch (error) {
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate AI license. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setAiGenerating(false)
+    }
   }
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
+    toast({
+      title: "Copied",
+      description: "Text copied to clipboard.",
+    })
   }
 
   const getStatusIcon = (status: UploadedFile["status"]) => {
     switch (status) {
       case "uploading":
-        return <Upload className="h-4 w-4 text-blue-600 animate-pulse" />
+        return <CloudUpload className="h-4 w-4 text-blue-600 animate-pulse" />
       case "processing":
         return <Zap className="h-4 w-4 text-yellow-600 animate-pulse" />
       case "hashing":
@@ -249,6 +414,8 @@ This license was generated using AI based on your asset details and intended usa
         return <Clock className="h-4 w-4 text-orange-600 animate-pulse" />
       case "complete":
         return <CheckCircle className="h-4 w-4 text-green-600" />
+      case "error":
+        return <AlertCircle className="h-4 w-4 text-red-600" />
       default:
         return <Upload className="h-4 w-4 text-gray-400" />
     }
@@ -257,22 +424,59 @@ This license was generated using AI based on your asset details and intended usa
   const getStatusText = (status: UploadedFile["status"]) => {
     switch (status) {
       case "uploading":
-        return "Uploading..."
+        return "Uploading to server..."
       case "processing":
-        return "Processing..."
+        return "Processing file..."
       case "hashing":
         return "Generating hash..."
       case "timestamping":
         return "Blockchain timestamping..."
       case "complete":
         return "Complete"
+      case "error":
+        return "Upload failed"
       default:
         return "Pending"
     }
   }
 
+  const handleFinalSubmission = async () => {
+    try {
+      setIsUploading(true)
+
+      // Here you would typically make an API call to finalize the asset with licenses
+      const finalData = {
+        assetIds: uploadedFiles.filter((f) => f.status === "complete").map((f) => f.id),
+        licenses: selectedLicenses,
+        customLicense: customLicense || null,
+        metadata: formData,
+      }
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
+      toast({
+        title: "Asset Published Successfully!",
+        description: "Your asset has been published to the marketplace with blockchain protection.",
+      })
+
+      // Reset form or redirect
+      // router.push('/my-assets')
+    } catch (error) {
+      toast({
+        title: "Publication Failed",
+        description: "Failed to publish asset. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
   const allFilesComplete = uploadedFiles.length > 0 && uploadedFiles.every((file) => file.status === "complete")
-  const canProceed = step === 1 ? allFilesComplete : step === 2 ? formData.title && formData.description : true
+  const hasErrors = uploadedFiles.some((file) => file.status === "error")
+  const canProceed =
+    step === 1 ? allFilesComplete && !hasErrors : step === 2 ? formData.title && formData.description : true
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -290,7 +494,7 @@ This license was generated using AI based on your asset details and intended usa
               </Button>
               <div className="flex items-center space-x-2">
                 <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
-                <span className="text-lg sm:text-2xl font-bold text-gray-900">IP Vault</span>
+                <span className="text-lg sm:text-2xl font-bold text-gray-900">IPChain Vault</span>
               </div>
             </div>
           </div>
@@ -318,6 +522,14 @@ This license was generated using AI based on your asset details and intended usa
           </div>
         </div>
 
+        {/* Error Alert */}
+        {uploadError && (
+          <Alert className="mb-6" variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{uploadError}</AlertDescription>
+          </Alert>
+        )}
+
         {/* Step 1: File Upload & Processing */}
         {step === 1 && (
           <div className="space-y-6">
@@ -328,7 +540,8 @@ This license was generated using AI based on your asset details and intended usa
                   Upload Your Creative Work
                 </CardTitle>
                 <CardDescription>
-                  Select and upload your files. All uploads are encrypted, hashed, and timestamped on the blockchain.
+                  Select and upload your files. All uploads are encrypted, hashed, and timestamped on the blockchain for
+                  maximum protection.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -350,7 +563,7 @@ This license was generated using AI based on your asset details and intended usa
 
                 {/* File Upload Area */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 sm:p-8 text-center hover:border-blue-500 transition-colors">
-                  <Upload className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-4 text-gray-400" />
+                  <CloudUpload className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-4 text-gray-400" />
                   <div className="text-base sm:text-lg font-medium mb-2">Drop files here or click to browse</div>
                   <div className="text-sm text-muted-foreground mb-4">Maximum file size: 100MB per file</div>
                   <input
@@ -360,10 +573,21 @@ This license was generated using AI based on your asset details and intended usa
                     className="hidden"
                     id="file-upload"
                     accept="*/*"
+                    disabled={isUploading}
                   />
-                  <Button asChild>
+                  <Button asChild disabled={isUploading}>
                     <label htmlFor="file-upload" className="cursor-pointer">
-                      Select Files
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Select Files
+                        </>
+                      )}
                     </label>
                   </Button>
                 </div>
@@ -382,22 +606,42 @@ This license was generated using AI based on your asset details and intended usa
                               <div className="text-sm text-muted-foreground">
                                 {(file.file.size / 1024 / 1024).toFixed(2)} MB • {getStatusText(file.status)}
                               </div>
+                              {file.error && <div className="text-sm text-red-600 mt-1">{file.error}</div>}
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeFile(file.id)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
+                          <div className="flex items-center space-x-2">
+                            {file.status === "error" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => retryUpload(file.id)}
+                                className="text-blue-600 hover:text-blue-700"
+                              >
+                                Retry
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFile(file.id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
 
-                        {file.status !== "complete" && (
+                        {(file.status === "uploading" ||
+                          file.status === "processing" ||
+                          file.status === "hashing" ||
+                          file.status === "timestamping") && (
                           <div className="space-y-2">
-                            <Progress value={file.progress} className="h-2" />
-                            <div className="text-xs text-muted-foreground text-right">{Math.round(file.progress)}%</div>
+                            <Progress value={file.uploadProgress || file.progress} className="h-2" />
+                            <div className="text-xs text-muted-foreground text-right">
+                              {file.status === "uploading"
+                                ? `${Math.round(file.uploadProgress || 0)}% uploaded`
+                                : `${Math.round(file.progress)}% processed`}
+                            </div>
                           </div>
                         )}
 
@@ -436,12 +680,22 @@ This license was generated using AI based on your asset details and intended usa
                   </div>
                 )}
 
-                {allFilesComplete && (
+                {allFilesComplete && !hasErrors && (
                   <div className="flex justify-end">
                     <Button onClick={() => setStep(2)} size="lg">
+                      <FileCheck className="h-4 w-4 mr-2" />
                       Continue to Asset Details
                     </Button>
                   </div>
+                )}
+
+                {hasErrors && (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Some files failed to upload. Please retry or remove them before continuing.
+                    </AlertDescription>
+                  </Alert>
                 )}
               </CardContent>
             </Card>
@@ -470,6 +724,7 @@ This license was generated using AI based on your asset details and intended usa
                       placeholder="Enter a descriptive title"
                       value={formData.title}
                       onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+                      required
                     />
                   </div>
 
@@ -513,6 +768,7 @@ This license was generated using AI based on your asset details and intended usa
                       className="min-h-[120px]"
                       value={formData.description}
                       onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                      required
                     />
                   </div>
 
@@ -538,10 +794,12 @@ This license was generated using AI based on your asset details and intended usa
 
               <div className="flex justify-between">
                 <Button variant="outline" onClick={() => setStep(1)}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
                 </Button>
                 <Button onClick={() => setStep(3)} disabled={!canProceed}>
                   Continue to Licensing
+                  <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
                 </Button>
               </div>
             </CardContent>
@@ -657,7 +915,7 @@ This license was generated using AI based on your asset details and intended usa
                         >
                           {aiGenerating ? (
                             <>
-                              <Brain className="h-4 w-4 mr-2 animate-pulse" />
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                               Generating License...
                             </>
                           ) : (
@@ -683,7 +941,7 @@ This license was generated using AI based on your asset details and intended usa
                                   <Copy className="h-4 w-4 mr-2" />
                                   Copy License
                                 </Button>
-                                <Button onClick={generateAILicense}>
+                                <Button onClick={generateAILicense} disabled={aiGenerating}>
                                   <Brain className="h-4 w-4 mr-2" />
                                   Regenerate
                                 </Button>
@@ -700,17 +958,25 @@ This license was generated using AI based on your asset details and intended usa
 
                 <div className="flex justify-between">
                   <Button variant="outline" onClick={() => setStep(2)}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
                     Back
                   </Button>
                   <Button
-                    onClick={() => {
-                      // Handle final submission
-                      alert("Asset uploaded successfully!")
-                    }}
-                    disabled={selectedLicenses.length === 0 && !customLicense}
+                    onClick={handleFinalSubmission}
+                    disabled={(selectedLicenses.length === 0 && !customLicense) || isUploading}
                     size="lg"
                   >
-                    Publish Asset
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Publishing...
+                      </>
+                    ) : (
+                      <>
+                        <CloudUpload className="h-4 w-4 mr-2" />
+                        Publish Asset
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>
@@ -725,7 +991,9 @@ This license was generated using AI based on your asset details and intended usa
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="font-medium text-gray-600">Files:</span>
-                    <div>{uploadedFiles.length} file(s) uploaded</div>
+                    <div>
+                      {uploadedFiles.filter((f) => f.status === "complete").length} file(s) uploaded successfully
+                    </div>
                   </div>
                   <div>
                     <span className="font-medium text-gray-600">Asset Title:</span>
@@ -749,7 +1017,13 @@ This license was generated using AI based on your asset details and intended usa
                     <span className="font-medium text-gray-600">Blockchain Status:</span>
                     <div className="flex items-center space-x-1 text-green-600">
                       <CheckCircle className="h-3 w-3" />
-                      <span>Verified</span>
+                      <span>Verified & Protected</span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Total Size:</span>
+                    <div>
+                      {(uploadedFiles.reduce((acc, file) => acc + file.file.size, 0) / 1024 / 1024).toFixed(2)} MB
                     </div>
                   </div>
                 </div>

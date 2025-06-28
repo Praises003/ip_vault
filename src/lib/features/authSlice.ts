@@ -1,7 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction, isRejectedWithValue } from "@reduxjs/toolkit"
+import { createSlice, createAsyncThunk, } from "@reduxjs/toolkit"
 import api from "@/lib/axios"
 import {setAccessToken} from "@/lib/authUtils"
-import { actionAsyncStorage } from "next/dist/server/app-render/action-async-storage.external"
+import axios from "axios"
+
 
 interface User {
   id: string
@@ -35,6 +36,7 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
     try {
       const res = await api.post("/api/auth/login", { email, password })
+      console.log(res)
       setAccessToken(res.data.tokens.accessToken) // Store token in authUtils
 
       return {
@@ -42,7 +44,8 @@ export const loginUser = createAsyncThunk(
         token: res.data.tokens.accessToken,
         message: res.data.message || "Login successful",
       }
-    } catch (err: any) {
+    } catch (err:Error | any) {
+      console.log(err)
       const message =
         err.response?.data?.message || err.response?.data?.error || err.message || "Login failed"
       return rejectWithValue(message)
@@ -63,7 +66,7 @@ export const registerUser = createAsyncThunk(
         user: res.data.user,
         message: res.data.message || "Registration successful. Please verify your email with the OTP sent to you."
       }
-    } catch (err: any) {
+    } catch (err: Error | any) {
       const msg =
         err.response?.data?.message ||
         err.response?.data?.error ||
@@ -88,7 +91,7 @@ export const verifyOtp = createAsyncThunk(
         token: res.data.tokens.accessToken,
         message: res.data.message || "OTP verified",
       }
-    } catch (err: any) {
+    } catch (err: Error | any) {
       const msg =
         err.response?.data?.message ||
         err.response?.data?.error ||
@@ -105,7 +108,7 @@ export const resendOtp = createAsyncThunk(
     try {
       const res = await api.post("/api/auth/resend-otp", { email })
       return { message: res.data.message || "OTP resent successfully" }
-    } catch (err: any) {
+    } catch (err: Error | any) {
       const msg =
         err.response?.data?.message ||
         err.response?.data?.error ||
@@ -122,7 +125,7 @@ export const forgotPassword = createAsyncThunk(
     try {
       const res = await api.post("/api/auth/forgot-password", { email })
       return res.data
-    } catch (err: any) {
+    } catch (err: Error | any) {
       return rejectWithValue(err.response?.data?.message || "Something went wrong")
     }
   }
@@ -139,7 +142,7 @@ export const resetPassword = createAsyncThunk(
         token, email, password, confirmPassword,
       })
       return res.data
-    } catch (err: any) {
+    } catch (err: Error | any) {
       return rejectWithValue(err.response?.data?.message || "Reset failed")
     }
   }
@@ -154,13 +157,18 @@ export const checkUser = createAsyncThunk<User, void>(
         { withCredentials: true }
       )
       return data
-    } catch (error: any) {
+    } catch (error: Error | any) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || error.message || "Failed to check user"
       )
     }
   }
 )
+
+export const logoutUser = () => {
+  // Remove token from localStorage
+  removeAccessToken();
+};
 
 
 
