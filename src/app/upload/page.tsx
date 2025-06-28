@@ -17,7 +17,7 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "@/lib/use-toast"
 import {
   Shield,
   Upload,
@@ -193,7 +193,7 @@ export default function UploadPage() {
       restrictions: [],
     },
   ]
-
+  
   // Real file upload function using Axios
   const uploadFileToServer = async (file: File, fileId: string) => {
     try {
@@ -524,7 +524,7 @@ This license was generated using AI based on your asset details and intended usa
 
         {/* Error Alert */}
         {uploadError && (
-          <Alert className="mb-6" variant="destructive">
+          <Alert className="mb-6" variant="error">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{uploadError}</AlertDescription>
           </Alert>
