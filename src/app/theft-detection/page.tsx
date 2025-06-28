@@ -192,12 +192,11 @@ export default function TheftDetectionPage() {
       const response = await api.post("/api/detection/check", {
         imageUrl,
         assetId: assetId || "677480b3-0690-4fad-ad3d-d74cec37e891",
-        saveResult: true,
-        page,
-        limit,
+        saveResult: false,
       })
 
-      const data: ApiDetectionResponse = response.data
+      const data = response.data
+      console.log(data)
 
       // Handle different response formats
       let detections: DetectionResult[] = []
