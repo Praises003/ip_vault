@@ -446,7 +446,7 @@ export default function WhistleblowerProfilePage() {
                       <div className="flex items-start gap-4">
                         <Quote className="w-6 h-6 text-blue-500 flex-shrink-0 mt-1" />
                         <div className="flex-1">
-                          <p className="text-gray-700 mb-4 italic">"{testimonial.content}"</p>
+                          <p className="text-gray-700 mb-4 italic">{testimonial.content}</p>
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="font-medium text-gray-900">{testimonial.author}</p>

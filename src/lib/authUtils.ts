@@ -1,5 +1,5 @@
 // // libs/authUtils.ts
- let accessToken: string | null = null
+ const accessToken: string | null = null
 
 // export function setAccessToken(token: string | null) {
 //   accessToken = token
