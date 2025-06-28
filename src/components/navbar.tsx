@@ -12,9 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useDispatch, useSelector } from "react-redux"
 
-import {  RootState } from "@/lib/store"
 
 
 // const navigationLinks = [
@@ -31,29 +29,25 @@ import {  RootState } from "@/lib/store"
 // ]
 
 export function Navbar() {
-  const { user, checkedUser} = useSelector((state: RootState) => state.auth)
-
-const authenticatedUser = user ?? checkedUser
-const isAuthenticated = !!authenticatedUser
+  
 const publicLinks = [
   { name: "Home", href: "/" },
   { name: "Pricing", href: "/pricing" },
-  { name: "FAQ", href: "/faq" },
-  { name: "Contact", href: "/support" },
-  { name: "About", href: "/about" }, 
+
   { name: "Login", href: "/login" },
   { name: "Sign Up", href: "/signup" },
-  
-]
-
-const privateLinks = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Upload Assets", href: "/upload" },
   { name: "Marketplace", href: "/marketplace" },
   { name: "Theft Detection", href: "/theft-detection" },
   { name: "Takedown Management", href: "/takedown-management" },
   { name: "My Assets", href: "/my-assets" },
-  { name: "License Management", href: "/license-management" },
+  { name: "License Management", href: "/license-management" }
+  
+]
+
+const privateLinks = [
+  { name: "Faq", href: "/faq" },
   
 ]
 
@@ -89,7 +83,7 @@ const privateLinks = [
                   {link.name}
                 </Link>
               ))}
-              {isAuthenticated && privateLinks.map((link) => (
+              { privateLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
@@ -175,7 +169,7 @@ const privateLinks = [
                 </Link>
               ))}
             
-            {isAuthenticated &&
+            {
               privateLinks.map((link) => (
                 <Link
                   key={link.name}
