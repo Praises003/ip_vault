@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import api from "@/lib/axios"
+import axios from "axios"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -243,8 +244,21 @@ export default function UploadPage() {
       } else {
         throw new Error(response.data.message || "Upload failed")
       }
-    } catch (error: any) {
-      console.error("Upload error:", error)
+    } catch (error: unknown) {
+  console.error("Upload error:", error);
+
+  let errorMessage = "Upload failed"; // Default message
+
+  if (error instanceof axios.AxiosError) {
+    // If its an AxiosError, we can access response and data
+    errorMessage = error.response?.data?.message || error.message || errorMessage;
+  } else if (error instanceof Error) {
+    // If its a regular Error, we can access message
+    errorMessage = error.message || errorMessage;
+  } else {
+    // If its some unknown error, log it safely
+    console.error("An unknown error occurred:", error);
+  }
 
       setUploadedFiles((prev) =>
         prev.map((f) =>
@@ -252,7 +266,7 @@ export default function UploadPage() {
             ? {
                 ...f,
                 status: "error",
-                error: error.response?.data?.message || error.message || "Upload failed",
+                error: errorMessage
               }
             : f,
         ),
@@ -260,7 +274,7 @@ export default function UploadPage() {
 
       toast({
         title: "Upload Failed",
-        description: error.response?.data?.message || error.message || "Failed to upload file",
+        description: errorMessage,
         variant: "destructive",
       })
     }

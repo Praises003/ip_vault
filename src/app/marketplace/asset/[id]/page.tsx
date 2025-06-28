@@ -7,9 +7,17 @@ import api from "@/lib/axios"
 import AssetDetailLayout from "@/components/AssetDetailLayout"
 import { Skeleton } from "@/components/ui/skeleton"
 
+interface Asset {
+  id: string
+  name: string
+  description: string
+  price: number
+  // Add any other properties you expect in the API response
+}
+
 export default function AssetDetailPage() {
   const { id } = useParams()
-  const [asset, setAsset] = useState<any>(null)
+  const [asset, setAsset] = useState<Asset | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

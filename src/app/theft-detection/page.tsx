@@ -74,17 +74,18 @@ interface SearchAsset {
   uploadDate: string
 }
 
-interface ApiDetectionResponse {
-  success?: boolean
-  data?: DetectionResult[]
-  detections?: DetectionResult[]
-  totalCount?: number
-  total?: number
-  page?: number
-  limit?: number
-  message?: string
-  error?: string
-}
+
+// interface ApiDetectionResponse {
+//   success?: boolean
+//   data?: DetectionResult[]
+//   detections?: DetectionResult[]
+//   totalCount?: number
+//   total?: number
+//   page?: number
+//   limit?: number
+//   message?: string
+//   error?: string
+// }
 
 // Define the type of the status key (we're using keyof to restrict it to the keys of statusConfig)
 type Status = "match" | "no-match" | "pending" | "investigating" | "takedown_sent" | "resolved" | "false_positive";
@@ -97,14 +98,14 @@ interface StatusConfig {
 }
 
 type IconType = "image" | "text" | "video" | "audio" | "code"; // Define the valid types for the icons
-
-const icons: Record<IconType, React.ComponentType<{ className: string }>> = {
-  image: ImageIcon,
-  text: FileText,
-  video: Video,
-  audio: Music,
-  code: Code,
-};
+type SearchMethod = "upload" | "select" | "url";
+// const icons: Record<IconType, React.ComponentType<{ className: string }>> = {
+//   image: ImageIcon,
+//   text: FileText,
+//   video: Video,
+//   audio: Music,
+//   code: Code,
+// };
 
 
 // Axios instance for API calls
@@ -125,7 +126,7 @@ const icons: Record<IconType, React.ComponentType<{ className: string }>> = {
 // })
 
 export default function TheftDetectionPage() {
-  const [searchMethod, setSearchMethod] = useState<"upload" | "select" | "url">("url")
+  const [searchMethod, setSearchMethod] = useState<SearchMethod>("url")
   const [selectedAsset, setSelectedAsset] = useState<string>("")
   const [searchUrl, setSearchUrl] = useState("")
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
@@ -193,6 +194,8 @@ export default function TheftDetectionPage() {
         imageUrl,
         assetId: assetId || "677480b3-0690-4fad-ad3d-d74cec37e891",
         saveResult: false,
+        page,
+        limit
       })
 
       const data = response.data
@@ -277,9 +280,13 @@ export default function TheftDetectionPage() {
             throw new Error("Please upload a file to search for")
           }
           // Handle file upload - you might need to upload the file first and get a URL
-          // For now, we'll use a placeholder
+          // For now, well use a placeholder
           imageUrl = URL.createObjectURL(uploadedFile)
         }
+        
+
+
+  
 
         // Simulate search progress
         const progressSteps = [
@@ -298,7 +305,7 @@ export default function TheftDetectionPage() {
         }
 
         // Make actual API call
-        const detections = await runDetectionAPI(imageUrl, assetId, page)
+        const detections: DetectionResult[] = await runDetectionAPI(imageUrl, assetId, page)
 
         setSearchProgress(100)
         setSearchResults(detections)
@@ -343,6 +350,8 @@ export default function TheftDetectionPage() {
       setError("")
     }
   }
+
+  
 
   const validateUrl = (url: string): boolean => {
     try {
@@ -948,7 +957,7 @@ Sincerely,
                   <Search className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">No Search Results</h3>
                   <p className="text-gray-600 mb-6">
-                    Configure your search settings and click "Start Theft Detection" to begin scanning for unauthorized
+                    Configure your search settings and click Start Theft Detection to begin scanning for unauthorized
                     use of your creative works.
                   </p>
                   <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">

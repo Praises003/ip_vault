@@ -7,11 +7,11 @@ import api from "@/lib/axios"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Separator } from "@/components/ui/separator"
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
-  Shield, ArrowLeft, Star, Eye, Download, Heart, Share2,
-  FileText, Check, X, User, CreditCard
+   ArrowLeft, Star, Eye, Download, Heart, Share2,
+   CreditCard
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 

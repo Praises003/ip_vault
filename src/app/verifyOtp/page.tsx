@@ -65,10 +65,14 @@ export default function VerifyOtpPage() {
   try {
     await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/resend-otp`, { email })
     toast.success("OTP has been resent to your email.")
-  } catch (error: Error | any) {
-    const msg = error.response?.data?.message || "Failed to resend OTP"
-    toast.error(msg)
+  } catch (error: unknown) {
+  if (error instanceof Error) {
+    const msg = (error as any).response?.data?.message || "Failed to resend OTP";
+    toast.error(msg);
+  } else {
+    toast.error("An unknown error occurred");
   }
+}
 }
 
   useEffect(() => {
@@ -89,7 +93,7 @@ export default function VerifyOtpPage() {
         </CardHeader>
         <CardContent className="space-y-6 p-6">
           <p className="text-center text-gray-600">
-            Enter the 4‑digit code sent to <span className="font-medium">{email}</span>.
+            Enter the 4 digit code sent to <span className="font-medium">{email}</span>.
           </p>
           <form onSubmit={handleVerify} className="space-y-4">
             <div>
@@ -117,7 +121,7 @@ export default function VerifyOtpPage() {
           </form>
 
           <p className="text-sm text-center text-gray-600">
-  Didn’t get the code?{" "}
+  Didnt get the code?{" "}
   <button
     type="button"
     onClick={resendOtp}

@@ -64,10 +64,10 @@ const whistleblowerProfiles: { [key: string]: WhistleblowerProfile } = {
     status: "Expert",
     description: "Specialized in digital art theft detection with 5+ years experience",
     fullBio:
-      "Sarah Chen is a renowned digital forensics expert with over 8 years of experience in intellectual property protection. She holds a Master's degree in Computer Science from MIT and has worked with major art galleries and digital platforms to combat art theft. Her innovative techniques in reverse image searching and blockchain verification have helped recover millions of dollars in stolen digital assets.",
+      "Sarah Chen is a renowned digital forensics expert with over 8 years of experience in intellectual property protection. She holds a Masters degree in Computer Science from MIT and has worked with major art galleries and digital platforms to combat art theft. Her innovative techniques in reverse image searching and blockchain verification have helped recover millions of dollars in stolen digital assets.",
     credentials: [
       "Certified Digital Forensics Examiner (CDFE)",
-      "Master's in Computer Science - MIT",
+      "Masters in Computer Science - MIT",
       "Blockchain Technology Specialist",
       "Former Senior Investigator at ArtGuard Inc.",
     ],
@@ -106,7 +106,7 @@ const whistleblowerProfiles: { [key: string]: WhistleblowerProfile } = {
         author: "David Kim",
         role: "NFT Creator",
         content:
-          "Thanks to Sarah's investigation, we were able to take down counterfeit versions of our NFT collection and recover significant damages.",
+          "Thanks to Sarah investigation, we were able to take down counterfeit versions of our NFT collection and recover significant damages.",
         rating: 5,
       },
     ],
@@ -173,7 +173,7 @@ const whistleblowerProfiles: { [key: string]: WhistleblowerProfile } = {
 
 export default function WhistleblowerProfilePage() {
   const params = useParams()
-  const router = useRouter()
+  //const router = useRouter()
   const [activeTab, setActiveTab] = useState("overview")
 
   const whistleblower = whistleblowerProfiles[params.id as string]
@@ -183,7 +183,7 @@ export default function WhistleblowerProfilePage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6 lg:p-8">
         <div className="max-w-4xl mx-auto text-center py-12">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Whistleblower Not Found</h1>
-          <p className="text-gray-600 mb-6">The whistleblower profile you're looking for doesn't exist.</p>
+          <p className="text-gray-600 mb-6">The whistleblower profile youre looking for doesnt exist.</p>
           <Link href="/whistleblower-network">
             <Button>
               <ArrowLeft className="w-4 h-4 mr-2" />

@@ -6,8 +6,8 @@ import { toast, ToastContainer } from "react-toastify"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { resetPassword } from "@/lib/features/authSlice"
-import { useDispatch, useSelector } from "react-redux"
-import { AppDispatch, RootState } from "@/lib/store"
+import { useDispatch } from "react-redux"
+import { AppDispatch } from "@/lib/store"
 
 export default function ResetPasswordPage() {
   const router = useRouter()
