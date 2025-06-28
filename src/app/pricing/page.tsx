@@ -29,7 +29,7 @@ const pricingPlans = [
   },
   {
     name: "Enterprise",
-    price: "₦8000",
+    price: "₦7500",
     period: "/month",
     description: "For large organizations with extensive IP portfolios",
     features: [
