@@ -191,7 +191,7 @@ export default function TheftDetectionPage() {
     try {
       const response = await api.post("/api/detection/check", {
         imageUrl,
-        assetId: assetId || null,
+        assetId: assetId || "677480b3-0690-4fad-ad3d-d74cec37e891",
         saveResult: true,
         page,
         limit,
